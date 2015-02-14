@@ -38,14 +38,25 @@ import java.awt.event.WindowEvent;
 import java.text.ParseException;
 
 import javax.swing.JFormattedTextField;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import javax.swing.JLabel;
+
+import reilaender.com.udojava.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class Calculator {
 
 	private JFrame frame;
-	private JTextField output;
-
+	private JFormattedTextField input;
+	
+	private JButton one, two, three, four, five, six, seven, eight, nine, zero,
+		plus, minus, div, multi,
+		equals, dot, clear
+		;
+	private JLabel output;
 	/**
 	 * Launch the application.
 	 */
@@ -80,29 +91,70 @@ public class Calculator {
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JPanel p_input = new JPanel();
+		p_input.setBackground(Color.WHITE);
 		p_input.setBorder(new EmptyBorder(10, 20, 10, 20));
 		frame.getContentPane().add(p_input, BorderLayout.NORTH);
 		GridBagLayout gbl_p_input = new GridBagLayout();
 		gbl_p_input.columnWidths = new int[]{442, 0};
 		gbl_p_input.rowHeights = new int[]{20, 0, 0};
 		gbl_p_input.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_p_input.rowWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+		gbl_p_input.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
 		p_input.setLayout(gbl_p_input);
 		
-		JFormattedTextField input = new JFormattedTextField();
+		final JFormattedTextField input = new JFormattedTextField();
+		input.setBorder(BorderFactory.createEmptyBorder());
 		input.addKeyListener(new KeyAdapter() {
+			private String err = "Not a valid number";
+			private boolean test;
 			@Override
-			public void keyTyped(KeyEvent arg0) {
-				char c = arg0.getKeyChar();
-				String err = "Not a valid number";
-				if( !(((c >= '0') && (c <= '9')) || (c == '+') || (c == '-') || (c == '*') || (c == '/'))) {
-					output.setText("");
+			public void keyPressed(KeyEvent e) {
+				char c = e.getKeyChar();
+				int k = e.getKeyCode();
+				System.out.println(k);
+				if(!(k == KeyEvent.VK_ENTER || k == KeyEvent.VK_SPACE)) {
+					output.setText(err);
+					e.consume();
+					test = false;
+				}
+			}
+			@Override
+			public void keyTyped(KeyEvent e) {
+				char c = e.getKeyChar();
+				int k = e.getKeyCode();
+				System.out.println(k);
+				if( !( ((c >= '0') && (c <= '9')) || (c == '+') || (c == '-') || (c == '*') || (c == '/')) ) {
+					System.out.println("hier");
 					output.setText(err);
 					
-					arg0.consume();
-				} else if (output.getText().equals(err)){
+					e.consume();
+				} else if (output.getText().equals(err)) {
 					output.setText("");
+				} else if (test) {
+					
 				}
+				input.requestFocus();
+			}
+			@Override
+			public void keyReleased(KeyEvent e) {
+				char c = e.getKeyChar();
+				int k = e.getKeyCode();
+//				Expression expr = new Expression("1000000000000000000000000000000000000000000000000+1");
+//				String[] a = input.getText().split("[+]");
+//				for(int i = 0; i < a.length;++i) {
+//					if(a[i].contains("-")) {
+//						String[] tmp = a[i].split("[-]");
+//						System.out.println("Minus:");
+//						for(int j = 0;j < tmp.length;++j)
+//							System.out.println(tmp[j]);
+//					}
+//					System.out.println(a[i]);
+//				}
+				if (k == KeyEvent.VK_ENTER || k == KeyEvent.VK_ENTER) {
+					output.setText("" + new Expression(input.getText()).eval());
+				} else if (k == KeyEvent.VK_SPACE) {
+					System.err.println("SPACE");
+				}
+				input.requestFocus();
 			}
 		});
 		GridBagConstraints gbc_input = new GridBagConstraints();
@@ -112,85 +164,129 @@ public class Calculator {
 		gbc_input.gridy = 0;
 		p_input.add(input, gbc_input);
 		
-		output = new JTextField();
-		output.setBorder(BorderFactory.createEmptyBorder());
-		output.setHorizontalAlignment(JTextField.RIGHT);
-		output.setForeground(Color.WHITE);
-		output.setEditable(false);
-		output.setEnabled(false);
+		output = new JLabel("");
+		output.setForeground(Color.LIGHT_GRAY);
 		GridBagConstraints gbc_output = new GridBagConstraints();
+		gbc_output.anchor = GridBagConstraints.NORTH;
 		gbc_output.fill = GridBagConstraints.HORIZONTAL;
 		gbc_output.gridx = 0;
 		gbc_output.gridy = 1;
 		p_input.add(output, gbc_output);
-		output.setColumns(1);
 		
 		JPanel p_numbers = new JPanel();
+		p_numbers.setBackground(Color.DARK_GRAY);
 		p_numbers.setBorder(new EmptyBorder(10, 10, 10, 10));
 		frame.getContentPane().add(p_numbers, BorderLayout.CENTER);
 		p_numbers.setLayout(new GridLayout(0, 3, 0, 0));
 		
-		JButton seven = new JButton("7");
+		seven = new JButton("7");
+		seven.setBorder(BorderFactory.createEmptyBorder());
+		seven.setBackground(Color.DARK_GRAY);
+		seven.setForeground(Color.WHITE);
 		p_numbers.add(seven);
 		
-		JButton eight = new JButton("8");
+		eight = new JButton("8");
+		eight.setBorder(BorderFactory.createEmptyBorder());
+		eight.setBackground(Color.DARK_GRAY);
+		eight.setForeground(Color.WHITE);
 		p_numbers.add(eight);
 		
-		JButton nine = new JButton("9");
+		nine = new JButton("9");
+		nine.setBorder(BorderFactory.createEmptyBorder());
+		nine.setBackground(Color.DARK_GRAY);
+		nine.setForeground(Color.WHITE);
 		p_numbers.add(nine);
 		
-		JButton four = new JButton("4");
+		four = new JButton("4");
+		four.setBorder(BorderFactory.createEmptyBorder());
+		four.setBackground(Color.DARK_GRAY);
+		four.setForeground(Color.WHITE);
 		p_numbers.add(four);
 		
-		JButton five = new JButton("5");
+		five = new JButton("5");
+		five.setBorder(BorderFactory.createEmptyBorder());
+		five.setBackground(Color.DARK_GRAY);
+		five.setForeground(Color.WHITE);
 		p_numbers.add(five);
 		
-		JButton six = new JButton("6");
+		six = new JButton("6");
+		six.setBorder(BorderFactory.createEmptyBorder());
+		six.setBackground(Color.DARK_GRAY);
+		six.setForeground(Color.WHITE);
 		p_numbers.add(six);
 		
-		JButton one = new JButton("1");
+		one = new JButton("1");
+		one.setBorder(BorderFactory.createEmptyBorder());
+		one.setBackground(Color.DARK_GRAY);
+		one.setForeground(Color.WHITE);
 		p_numbers.add(one);
 		
-		JButton two = new JButton("2");
+		two = new JButton("2");
+		two.setBorder(BorderFactory.createEmptyBorder());
+		two.setBackground(Color.DARK_GRAY);
+		two.setForeground(Color.WHITE);
 		p_numbers.add(two);
 		
-		JButton three = new JButton("3");
+		three = new JButton("3");
+		three.setBorder(BorderFactory.createEmptyBorder());
+		three.setBackground(Color.DARK_GRAY);
+		three.setForeground(Color.WHITE);
 		p_numbers.add(three);
 		
-		JButton dot = new JButton(".");
+		dot = new JButton(".");
+		dot.setBorder(BorderFactory.createEmptyBorder());
+		dot.setBackground(Color.DARK_GRAY);
+		dot.setForeground(Color.WHITE);
 		p_numbers.add(dot);
 		
-		JButton zero = new JButton("0");
+		zero = new JButton("0");
+		zero.setBorder(BorderFactory.createEmptyBorder());
+		zero.setBackground(Color.DARK_GRAY);
+		zero.setForeground(Color.WHITE);
 		p_numbers.add(zero);
 		
-		JButton equals = new JButton("=");
+		equals = new JButton("=");
+		equals.setBorder(BorderFactory.createEmptyBorder());
+		equals.setBackground(Color.DARK_GRAY);
+		equals.setForeground(Color.WHITE);
 		p_numbers.add(equals);
 		
 		JPanel p_operations = new JPanel();
-		p_operations.setBorder(new EmptyBorder(10, 1, 10, 10));
+		p_operations.setBackground(Color.GRAY);
+		p_operations.setBorder(new EmptyBorder(10, 10, 10, 10));
 		frame.getContentPane().add(p_operations, BorderLayout.EAST);
 		p_operations.setLayout(new GridLayout(5, 1, 0, 0));
 		
-		JButton clear = new JButton("CLR");
+		clear = new JButton("CLR");
+		clear.setBorder(BorderFactory.createEmptyBorder());
+		clear.setBackground(Color.GRAY);
 		clear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				output.setText("");
 				input.setText("");
-				output.setText("Test");
+				input.requestFocus();
 			}
 		});
 		p_operations.add(clear);
 		
-		JButton div = new JButton("/");
+		div = new JButton("/");
+		div.setBorder(BorderFactory.createEmptyBorder());
+		div.setBackground(Color.GRAY);
 		p_operations.add(div);
 		
-		JButton multi = new JButton("x");
+		multi = new JButton("x");
+		multi.setBorder(BorderFactory.createEmptyBorder());
+		multi.setBackground(Color.GRAY);
 		p_operations.add(multi);
 		
-		JButton minus = new JButton("-");
+		minus = new JButton("-");
+		minus.setBorder(BorderFactory.createEmptyBorder());
+		minus.setBackground(Color.GRAY);
 		p_operations.add(minus);
 		
-		JButton plus = new JButton("+");
+		plus = new JButton("+");
+		plus.setBorder(BorderFactory.createEmptyBorder());
+		plus.setBackground(Color.GRAY);
 		plus.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
